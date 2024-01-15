@@ -1,4 +1,4 @@
-FROM golang:1.20.2-alpine3.17
+FROM golang:1.21.6-alpine3.19
 COPY test.sh /test.sh
 RUN apk update && \
     apk add --no-cache ca-certificates && \
