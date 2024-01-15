@@ -15,3 +15,36 @@ presubmits:
           requests:
             cpu: 2
             memory: 2Gi
+  - name: build-push-pre-image
+    cluster: default
+    always_run: true
+    annotations:
+      description: Build and Push Image to DockerHub
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 1
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD} \
+            --dockerfile=Dockerfile --destination=nephio/pre-build-test:${BUILD_ID}
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
